@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>K-Mart Billing</title>
+</head>
+<body>
+  <h1>Welcome to K-Mart</h1>
+  <div id="cart">
+    <h2>Items in Cart</h2>
+    <ul id="item-list"></ul>
+    <h3>Total Cost: ₹<span id="total-cost">0</span></h3>
+  </div>
+  <button onclick="resetCart()">Reset</button>
+  <button onclick="printReceipt()">Print</button>
+  <button onclick="generateQR()">Generate QR</button>
+  <div id="qr-code"></div>
+  <script>
+    async function fetchCart() {
+      const response = await fetch('http://localhost:3000/cart');
+      const data = await response.json();
+      document.getElementById('item-list').innerHTML = data.items.map(item => `<li>${item.name} - ₹${item.price}</li>`).join('');
+      document.getElementById('total-cost').textContent = data.totalCost;
+    }
+
+    async function resetCart() {
+      await fetch('http://localhost:3000/reset', { method: 'POST' });
+      fetchCart();
+    }
+
+    function printReceipt() {
+      window.print();
+    }
+
+    function generateQR() {
+      const totalCost = document.getElementById('total-cost').textContent;
+      document.getElementById('qr-code').innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?data=${totalCost}&size=150x150" alt="QR Code">`;
+    }
+
+    fetchCart();
+  </script>
+</body>
+</html>
